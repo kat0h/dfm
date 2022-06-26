@@ -3,7 +3,9 @@ import Manager from "./main.ts";
 import Symlink from "./sources/symlink.ts";
 const m = new Manager();
 
-const s = new Symlink();
+const s = new Symlink({
+  dotfiles_dir: "~/dotfiles"
+});
 m.use(s);
 
 s.link([

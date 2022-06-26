@@ -1,6 +1,7 @@
 import {
   fromFileUrl,
   toFileUrl,
+  join,
 } from "https://deno.land/std@0.145.0/path/mod.ts";
 import { expandTilde } from "../utils.ts";
 import { Source, SourceInfo } from "../main.ts";
@@ -13,7 +14,7 @@ import {
 export default class Symlink implements Source {
   // links[n][0]: 実体 links[n][1]: シンボリックリンク
   private links: { from: URL; to: URL }[] = [];
-  private dotfiles_dir: URL;
+  private dotfiles_dir: string;
 
   info: SourceInfo = {
     name: "symlink",
@@ -24,13 +25,14 @@ export default class Symlink implements Source {
 
   constructor(options?: { dotfiles_dir?: string }) {
     if (options !== undefined && options.dotfiles_dir !== undefined) {
-      this.dotfiles_dir = toFileUrl(expandTilde(options.dotfiles_dir));
+      this.dotfiles_dir = expandTilde(options.dotfiles_dir);
     } else {
-      this.dotfiles_dir = new URL(import.meta.url);
+      this.dotfiles_dir = new URL(import.meta.url).pathname;
     }
   }
 
   status() {
+    // Symlinkがきちんと貼られているか確認
     const stat = check_symlinks(this.links);
     return stat;
   }
@@ -40,13 +42,9 @@ export default class Symlink implements Source {
     return true;
   }
 
-  // subcmd(options: SubcmdOptions) {
-  //   return true;
-  // }
-
   link(links: [string, string][]) {
     links.forEach((link) => {
-      const from_url = new URL(expandTilde(link[0]), this.dotfiles_dir);
+      const from_url = toFileUrl(join(this.dotfiles_dir, expandTilde(link[0])));
       const to_url = toFileUrl(expandTilde(link[1]));
       this.links.push({
         from: from_url,

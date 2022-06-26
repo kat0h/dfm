@@ -6,7 +6,6 @@ import {
   red,
   yellow,
 } from "https://deno.land/std@0.145.0/fmt/colors.ts";
-import { expandTilde } from "./utils.ts";
 
 export interface Source {
   info: SourceInfo;
@@ -119,6 +118,16 @@ export default class Manager {
 
   private cmd_status(_: SubcmdOptions): boolean {
     const exit_status: { name: string; is_failed: boolean }[] = [];
+
+    // LOADED SOURCES
+    console.log(blue(bold("STATUS")));
+    console.log("LOADED SOURCES:");
+    this.sources.forEach((s) => {
+      console.log(`・${s.info.name}`);
+    });
+    console.log();
+
+    // SOURCE's STATUS
     this.sources.forEach((s) => {
       if (s.status != undefined) {
         console.log(blue(bold(s.info.name.toUpperCase())));
@@ -126,12 +135,8 @@ export default class Manager {
         exit_status.push({ name: s.info.name, is_failed: is_failed });
       }
     });
-    console.log(blue(bold("STATUS")));
-    console.log("LOADED SOURCES:");
-    this.sources.forEach((s) => {
-      console.log(`・${s.info.name}`);
-    });
-    console.log();
+
+    // CHECK ERROR
     const noerr =
       exit_status.filter((s) => s.is_failed).length === exit_status.length;
     if (noerr) {
