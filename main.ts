@@ -6,7 +6,6 @@ import {
   red,
   yellow,
 } from "https://deno.land/std@0.145.0/fmt/colors.ts";
-// todo: 終了ステータスを設定
 
 type Subcmd = { name: string; info: string; func: () => boolean };
 
