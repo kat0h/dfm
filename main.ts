@@ -140,7 +140,7 @@ export default class Manager {
     const noerr =
       exit_status.filter((s) => s.is_failed).length === exit_status.length;
     if (noerr) {
-      console.log(bold(`${green("✔ ")}NO Error was detected`));
+      console.log(bold(`${green("✔  ")}NO Error was detected`));
       return true;
     } else {
       console.log(`${red("✘  ")}Error was detected`);

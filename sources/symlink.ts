@@ -1,7 +1,7 @@
 import {
   fromFileUrl,
-  toFileUrl,
   join,
+  toFileUrl,
 } from "https://deno.land/std@0.145.0/path/mod.ts";
 import { expandTilde } from "../utils.ts";
 import { Source, SourceInfo } from "../main.ts";
@@ -10,6 +10,7 @@ import {
   red,
   yellow,
 } from "https://deno.land/std@0.145.0/fmt/colors.ts";
+import { ensureSymlinkSync, existsSync } from "https://deno.land/std@0.145.0/fs/mod.ts";
 
 export default class Symlink implements Source {
   // links[n][0]: 実体 links[n][1]: シンボリックリンク
@@ -38,7 +39,8 @@ export default class Symlink implements Source {
   }
 
   update() {
-    console.log("symlink update\n");
+    ensure_make_symlinks(this.links);
+    console.log();
     return true;
   }
 
@@ -73,13 +75,30 @@ function check_symlinks(links: { from: URL; to: URL }[]): boolean {
 }
 
 function check_symlink(link: { from: URL; to: URL }): boolean {
-  const lstat = Deno.lstatSync(link.to);
-  if (lstat.isSymlink) {
-    if (Deno.readLinkSync(link.to) === fromFileUrl(link.from)) {
-      return true;
+  try {
+    const lstat = Deno.lstatSync(link.to);
+    if (lstat.isSymlink) {
+      if (Deno.readLinkSync(link.to) === fromFileUrl(link.from)) {
+        return true;
+      }
+      return false;
+    } else {
+      return false;
     }
-    return false;
-  } else {
+  } catch (_) {
     return false;
   }
+}
+
+function ensure_make_symlinks(links: { from: URL; to: URL }[]): void {
+  links.forEach((link) => {
+    const from = link.from.pathname;
+    const to = link.to.pathname;
+    if (!check_symlink(link)) {
+      console.log(`${green("✔ ")} ${from} -> ${to}`);
+      ensureSymlinkSync(from, to);
+    } else {
+      console.log(`${green("✔ ")} ${to}`);
+    }
+  });
 }
