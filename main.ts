@@ -6,35 +6,46 @@ import {
   red,
   yellow,
 } from "https://deno.land/std@0.145.0/fmt/colors.ts";
-// todo: 終了ステータスを設定
 
-type Subcmd = { name: string; info: string; func: () => boolean };
+export interface Source {
+  info: SourceInfo;
+  // souces must returns exit status
+  // if the process failed, the function returns false
+  status?: () => boolean;
+  update?: () => boolean;
+  subcmd?: (options: SubcmdOptions) => boolean;
+}
 
-interface Info {
+export interface SourceInfo {
   name: string;
   subcmd?: {
-    name: string;
     info: string;
   };
 }
 
-export interface Source {
-  info: Info;
-  setup: (manager: Manager) => void;
-  // these must return exit status
-  // if the process failed, the function returns false
-  status?: () => boolean;
-  update?: () => boolean;
-  subcmd?: () => boolean;
+type Subcmd = {
+  name: string;
+  info: string;
+  func: (options: SubcmdOptions) => boolean;
+};
+
+interface Options {
+  subcmd?: SubcmdOptions;
+  debug: boolean;
+}
+
+export interface SubcmdOptions {
+  name: string;
+  args: ReturnType<typeof parse>;
 }
 
 export default class Manager {
-  private args: ReturnType<typeof parse>;
+  private options: Options;
   private sources: Source[] = [];
   private subcmds: Subcmd[];
 
   constructor() {
-    this.args = parse(Deno.args);
+    this.options = this.parse_argment(Deno.args);
     this.subcmds = [
       { name: "status", info: "show status", func: this.cmd_status.bind(this) },
       {
@@ -51,7 +62,7 @@ export default class Manager {
     // if the source has subcmd
     if (source.info.subcmd != undefined && source.subcmd != undefined) {
       this.subcmds.push({
-        name: source.info.subcmd.name,
+        name: source.info.name,
         info: source.info.subcmd.info,
         func: source.subcmd.bind(source),
       });
@@ -61,49 +72,86 @@ export default class Manager {
 
   end() {
     // exec subcmd
-    if (this.args._.length == 0) {
-      this.cmd_help();
+    if (this.options.subcmd === undefined) {
+      this.cmd_help({ name: "help", args: { _: [] } });
     } else {
+      const subcmd = this.options.subcmd;
       // check builtincmd
-      const cmd = this.subcmds.find((sc: Subcmd) => sc.name === this.args._[0]);
+      const cmd = this.subcmds.find((sc: Subcmd) => sc.name === subcmd.name);
       if (cmd !== undefined) {
-        const status = cmd.func();
+        const status = cmd.func(subcmd);
         if (!status) {
           Deno.exit(1);
         }
       } else {
-        console.error("Err: subcmd not found");
+        console.error(red("Err: subcmd not found"));
+        Deno.exit(1);
       }
     }
-    // for debug
-    if (this.args.debug === true) {
-      this.debug();
-    }
+    if (this.options.debug) this.debug();
   }
 
-  private cmd_status(): boolean {
+  private parse_argment(args: typeof Deno.args): Options {
+    const parsedargs = parse(args);
+
+    let debug = false;
+    if (parsedargs.debug === true) {
+      delete parsedargs.debug;
+      debug = true;
+    }
+
+    let subcmd: SubcmdOptions | undefined = undefined;
+    if (parsedargs._.length !== 0) {
+      const name = parsedargs._[0].toString();
+      parsedargs._.shift();
+      subcmd = {
+        name: name,
+        args: parsedargs,
+      };
+    }
+
+    return {
+      debug: debug,
+      subcmd: subcmd,
+    };
+  }
+
+  private cmd_status(_: SubcmdOptions): boolean {
     const exit_status: { name: string; is_failed: boolean }[] = [];
+
+    // LOADED SOURCES
+    console.log(blue(bold("STATUS")));
+    console.log("LOADED SOURCES:");
+    this.sources.forEach((s) => {
+      console.log(`・${s.info.name}`);
+    });
+    console.log();
+
+    // SOURCE's STATUS
     this.sources.forEach((s) => {
       if (s.status != undefined) {
+        console.log(blue(bold(s.info.name.toUpperCase())));
         const is_failed = s.status();
         exit_status.push({ name: s.info.name, is_failed: is_failed });
       }
     });
-    console.log(blue(bold("STATUS")));
+
+    // CHECK ERROR
     const noerr =
       exit_status.filter((s) => s.is_failed).length === exit_status.length;
     if (noerr) {
-      console.log(bold(`${green("✔ ")}NO Error was detected`));
+      console.log(bold(`${green("✔  ")}NO Error was detected`));
       return true;
     } else {
+      console.log(`${red("✘  ")}Error was detected`);
       exit_status.forEach((s) => {
-        console.log(`${red("✘ ")}${s.name}`);
+        console.log(`・${s.name}`);
       });
       return false;
     }
   }
 
-  private cmd_update(): boolean {
+  private cmd_update(_: SubcmdOptions): boolean {
     const exit_status: { name: string; is_failed: boolean }[] = [];
     this.sources.forEach((s) => {
       if (s.update != undefined) {
@@ -125,7 +173,7 @@ export default class Manager {
     }
   }
 
-  private cmd_help(): boolean {
+  private cmd_help(_: SubcmdOptions): boolean {
     const p = console.log;
     p(yellow(bold("dotmanager(3) v0.1")));
     p("	A dotfiles manager written in deno (typescript)\n");
@@ -140,8 +188,8 @@ export default class Manager {
 
   private debug() {
     console.log("\n\n==========DEBUG==========");
-    console.log(blue(bold("ARGS")));
-    console.dir(this.args);
+    console.log(blue(bold("OPTIONS")));
+    console.dir(this.options);
     console.log(blue(bold("SOURCES")));
     console.dir(this.sources);
     console.log(blue(bold("BUILTINCMD")));
