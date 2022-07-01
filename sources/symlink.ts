@@ -1,24 +1,13 @@
 // TODO: ディレクトリを掘る
 //
-// リンクが正しく配置されていないパターン
-// ・リンクがない
-// ・リンク先が間違っている
 // リンクを配置する手順
 // ・配置するディレクトリが存在するか確かめる
 // ・権限を持っているかを確かめる
 // ・リンクを貼る
-// パスを展開する手順
-// ・チルダを展開する
-// ・BaseDirと結合する
-// ・URL型に変換する
 
-import {
-  fromFileUrl,
-  join,
-  toFileUrl,
-} from "https://deno.land/std@0.145.0/path/mod.ts";
-import { expand_tilde } from "../utils.ts";
-import { Source, SourceInfo } from "../main.ts";
+import { fromFileUrl, toFileUrl } from "https://deno.land/std@0.145.0/path/mod.ts";
+import { resolve_path } from "../utils.ts";
+import { Source, SourceInfo } from "../main.ts"
 import {
   green,
   red,
@@ -39,8 +28,10 @@ export default class Symlink implements Source {
   };
 
   constructor(options?: { dotfiles_dir?: string }) {
+    // set dotfiles basedir
     if (options !== undefined && options.dotfiles_dir !== undefined) {
-      this.dotfiles_dir = expand_tilde(options.dotfiles_dir);
+      this.dotfiles_dir = resolve_path(options.dotfiles_dir)
+        resolve_path(options.dotfiles_dir);
     } else {
       this.dotfiles_dir = new URL(import.meta.url).pathname;
     }
@@ -61,9 +52,9 @@ export default class Symlink implements Source {
   link(links: [string, string][]) {
     links.forEach((link) => {
       const from_url = toFileUrl(
-        join(this.dotfiles_dir, expand_tilde(link[0])),
+        resolve_path(link[0], this.dotfiles_dir),
       );
-      const to_url = toFileUrl(expand_tilde(link[1]));
+      const to_url = toFileUrl(resolve_path(link[1]));
       this.links.push({
         from: from_url,
         to: to_url,
@@ -92,12 +83,15 @@ function check_symlinks(links: { from: URL; to: URL }[]): boolean {
 
 function check_symlink(link: { from: URL; to: URL }): boolean {
   try {
+    // Check for the presence of links
     const lstat = Deno.lstatSync(link.to);
     if (lstat.isSymlink) {
+      // Check where the link points
       if (Deno.readLinkSync(link.to) === fromFileUrl(link.from)) {
         return true;
+      } else {
+        return false;
       }
-      return false;
     } else {
       return false;
     }
@@ -106,6 +100,7 @@ function check_symlink(link: { from: URL; to: URL }): boolean {
   }
 }
 
+// if symlink does not exist, make symlink
 function ensure_make_symlinks(links: { from: URL; to: URL }[]): void {
   links.forEach((link) => {
     const from = link.from.pathname;
