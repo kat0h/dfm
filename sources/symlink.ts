@@ -1,3 +1,17 @@
+// TODO: ディレクトリを掘る
+//
+// リンクが正しく配置されていないパターン
+// ・リンクがない
+// ・リンク先が間違っている
+// リンクを配置する手順
+// ・配置するディレクトリが存在するか確かめる
+// ・権限を持っているかを確かめる
+// ・リンクを貼る
+// パスを展開する手順
+// ・チルダを展開する
+// ・BaseDirと結合する
+// ・URL型に変換する
+
 import {
   fromFileUrl,
   join,
@@ -10,7 +24,8 @@ import {
   red,
   yellow,
 } from "https://deno.land/std@0.145.0/fmt/colors.ts";
-import { ensureSymlinkSync, existsSync } from "https://deno.land/std@0.145.0/fs/mod.ts";
+import { ensureSymlinkSync } from "https://deno.land/std@0.145.0/fs/mod.ts";
+import { assertEquals } from "https://deno.land/std@0.145.0/testing/asserts.ts";
 
 export default class Symlink implements Source {
   // links[n][0]: 実体 links[n][1]: シンボリックリンク
@@ -102,3 +117,31 @@ function ensure_make_symlinks(links: { from: URL; to: URL }[]): void {
     }
   });
 }
+
+function expand_path(path: string, basedir?: string){
+  const path1 = expandTilde(path);
+  if (path === path1) {
+    if (basedir == undefined) {
+      return fromFileUrl(new URL(path, import.meta.url));
+    } else {
+      const path2 = join(path1, basedir);
+      return fromFileUrl(new URL(path2, basedir));
+    }
+  } else {
+    return path1;
+  }
+}
+
+Deno.test("expand_path #1", () => {
+  const expect = join(Deno.env.get("HOME") ?? "", "test/hoge");
+  const actual = expand_path("~/test/hoge");
+  console.log(expect, actual);
+  return assertEquals(expect, actual);
+});
+
+Deno.test("expand_path #2", () => {
+  const expect = join("/test/hoge");
+  const actual = expand_path("/test/hoge");
+  console.log(expect, actual);
+  return assertEquals(expect, actual);
+});

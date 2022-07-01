@@ -12,3 +12,4 @@ export function expandTilde(path: string) {
     return join(homedir, path.slice(2));
   }
 }
+
