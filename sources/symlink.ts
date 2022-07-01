@@ -17,7 +17,7 @@ import {
   join,
   toFileUrl,
 } from "https://deno.land/std@0.145.0/path/mod.ts";
-import { expandTilde } from "../utils.ts";
+import { expand_tilde } from "../utils.ts";
 import { Source, SourceInfo } from "../main.ts";
 import {
   green,
@@ -25,7 +25,6 @@ import {
   yellow,
 } from "https://deno.land/std@0.145.0/fmt/colors.ts";
 import { ensureSymlinkSync } from "https://deno.land/std@0.145.0/fs/mod.ts";
-import { assertEquals } from "https://deno.land/std@0.145.0/testing/asserts.ts";
 
 export default class Symlink implements Source {
   // links[n][0]: 実体 links[n][1]: シンボリックリンク
@@ -41,7 +40,7 @@ export default class Symlink implements Source {
 
   constructor(options?: { dotfiles_dir?: string }) {
     if (options !== undefined && options.dotfiles_dir !== undefined) {
-      this.dotfiles_dir = expandTilde(options.dotfiles_dir);
+      this.dotfiles_dir = expand_tilde(options.dotfiles_dir);
     } else {
       this.dotfiles_dir = new URL(import.meta.url).pathname;
     }
@@ -61,8 +60,10 @@ export default class Symlink implements Source {
 
   link(links: [string, string][]) {
     links.forEach((link) => {
-      const from_url = toFileUrl(join(this.dotfiles_dir, expandTilde(link[0])));
-      const to_url = toFileUrl(expandTilde(link[1]));
+      const from_url = toFileUrl(
+        join(this.dotfiles_dir, expand_tilde(link[0])),
+      );
+      const to_url = toFileUrl(expand_tilde(link[1]));
       this.links.push({
         from: from_url,
         to: to_url,
@@ -117,31 +118,3 @@ function ensure_make_symlinks(links: { from: URL; to: URL }[]): void {
     }
   });
 }
-
-function expand_path(path: string, basedir?: string){
-  const path1 = expandTilde(path);
-  if (path === path1) {
-    if (basedir == undefined) {
-      return fromFileUrl(new URL(path, import.meta.url));
-    } else {
-      const path2 = join(path1, basedir);
-      return fromFileUrl(new URL(path2, basedir));
-    }
-  } else {
-    return path1;
-  }
-}
-
-Deno.test("expand_path #1", () => {
-  const expect = join(Deno.env.get("HOME") ?? "", "test/hoge");
-  const actual = expand_path("~/test/hoge");
-  console.log(expect, actual);
-  return assertEquals(expect, actual);
-});
-
-Deno.test("expand_path #2", () => {
-  const expect = join("/test/hoge");
-  const actual = expand_path("/test/hoge");
-  console.log(expect, actual);
-  return assertEquals(expect, actual);
-});
