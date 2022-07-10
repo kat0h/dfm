@@ -1,4 +1,4 @@
-import { fromFileUrl, join, resolve } from "https://deno.land/std@0.145.0/path/mod.ts";
+import { join, resolve } from "https://deno.land/std@0.145.0/path/mod.ts";
 
 const homedir = Deno.env.get("HOME");
 

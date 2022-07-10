@@ -5,14 +5,13 @@
 // ・権限を持っているかを確かめる
 // ・リンクを貼る
 
-import { fromFileUrl, toFileUrl } from "https://deno.land/std@0.145.0/path/mod.ts";
-import { resolve_path } from "../utils.ts";
-import { Source, SourceInfo } from "../main.ts"
 import {
-  green,
-  red,
-  yellow,
-} from "https://deno.land/std@0.145.0/fmt/colors.ts";
+  fromFileUrl,
+  toFileUrl,
+} from "https://deno.land/std@0.145.0/path/mod.ts";
+import { resolve_path } from "../util/mod.ts";
+import { Source, SourceInfo } from "../main.ts";
+import { green, red } from "https://deno.land/std@0.145.0/fmt/colors.ts";
 import { ensureSymlinkSync } from "https://deno.land/std@0.145.0/fs/mod.ts";
 
 export default class Symlink implements Source {
@@ -30,8 +29,8 @@ export default class Symlink implements Source {
   constructor(options?: { dotfiles_dir?: string }) {
     // set dotfiles basedir
     if (options !== undefined && options.dotfiles_dir !== undefined) {
-      this.dotfiles_dir = resolve_path(options.dotfiles_dir)
-        resolve_path(options.dotfiles_dir);
+      this.dotfiles_dir = resolve_path(options.dotfiles_dir);
+      resolve_path(options.dotfiles_dir);
     } else {
       this.dotfiles_dir = new URL(import.meta.url).pathname;
     }
@@ -78,7 +77,7 @@ function check_symlinks(links: { from: URL; to: URL }[]): boolean {
     }
   });
   if (stat) {
-    console.log("All symlinks are ok")
+    console.log("All symlinks are ok");
   }
   console.log("");
   return stat;
@@ -112,7 +111,7 @@ function ensure_make_symlinks(links: { from: URL; to: URL }[]): void {
     if (!check_symlink(link)) {
       console.log(`${green("✔ ")} ${from} -> ${to}`);
       ensureSymlinkSync(from, to);
-    // } else {
+      // } else {
       // console.log(`${green("✔ ")} ${to}`);
     }
   });

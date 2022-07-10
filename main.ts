@@ -39,7 +39,7 @@ export interface SubcmdOptions {
   args: ReturnType<typeof parse>;
 }
 
-export default class Manager {
+export default class Dfm {
   private options: Options;
   private sources: Source[] = [];
   private subcmds: Subcmd[];
@@ -175,7 +175,7 @@ export default class Manager {
 
   private cmd_help(_: SubcmdOptions): boolean {
     const p = console.log;
-    p(yellow(bold("dotmanager(3) v0.1")));
+    p(yellow(bold("dfm(3) v0.1")));
     p("	A dotfiles manager written in deno (typescript)\n");
     p(yellow(bold("USAGE:")));
     p("	deno run -A [filename] [SUBCOMMANDS]\n");
