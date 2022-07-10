@@ -49,6 +49,7 @@ export default class Symlink implements Source {
     return true;
   }
 
+  // 作成するシンボリックリンクを登録
   link(links: [string, string][]) {
     links.forEach((link) => {
       const from_url = toFileUrl(
@@ -65,22 +66,25 @@ export default class Symlink implements Source {
 
 function check_symlinks(links: { from: URL; to: URL }[]): boolean {
   let stat = true;
-  console.log(yellow("LIST:"));
   links.forEach((link) => {
     const ok = check_symlink(link);
     if (!ok) {
       stat = false;
+      console.log(
+        `${ok ? green("✔ ") : red("✘ ")} ${fromFileUrl(link.from)} → ${
+          fromFileUrl(link.to)
+        }`,
+      );
     }
-    console.log(
-      `${ok ? green("✔ ") : red("✘ ")} ${fromFileUrl(link.from)} → ${
-        fromFileUrl(link.to)
-      }`,
-    );
   });
+  if (stat) {
+    console.log("All symlinks are ok")
+  }
   console.log("");
   return stat;
 }
 
+// シンボリックリンクが適切に作成されているかを確かめる
 function check_symlink(link: { from: URL; to: URL }): boolean {
   try {
     // Check for the presence of links
@@ -108,8 +112,8 @@ function ensure_make_symlinks(links: { from: URL; to: URL }[]): void {
     if (!check_symlink(link)) {
       console.log(`${green("✔ ")} ${from} -> ${to}`);
       ensureSymlinkSync(from, to);
-    } else {
-      console.log(`${green("✔ ")} ${to}`);
+    // } else {
+      // console.log(`${green("✔ ")} ${to}`);
     }
   });
 }
