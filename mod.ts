@@ -1,2 +1,2 @@
-import Dfm from "./main.ts"
-export default Dfm
+import Dfm from "./main.ts";
+export default Dfm;

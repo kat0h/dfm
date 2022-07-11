@@ -1,3 +1,3 @@
-import Symlink from "./symlink.ts"
+import Symlink from "./symlink.ts";
 
-export { Symlink }
+export { Symlink };

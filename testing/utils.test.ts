@@ -1,5 +1,4 @@
-import { assertEquals } from "https://deno.land/std@0.145.0/testing/asserts.ts";
-import { join } from "https://deno.land/std@0.145.0/path/mod.ts";
+import { assertEquals, join } from "../deps.ts";
 import { expand_tilde, resolve_path } from "../util/mod.ts";
 
 const home = Deno.env.get("HOME") ?? "";

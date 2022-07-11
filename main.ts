@@ -1,5 +1,5 @@
-import { parse } from "https://deno.land/std@0.144.0/flags/mod.ts";
-import {
+import { parse } from "./deps.ts";
+export {
   blue,
   bold,
   green,
