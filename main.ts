@@ -1,11 +1,7 @@
 import { parse } from "./deps.ts";
-import {
-  blue,
-  bold,
-  green,
-  red,
-  yellow,
-} from "https://deno.land/std@0.145.0/fmt/colors.ts";
+import { clr, deco } from "./util/mod.ts";
+
+const version = "v0.2";
 
 export interface Source {
   info: SourceInfo;
@@ -84,7 +80,7 @@ export default class Dfm {
           Deno.exit(1);
         }
       } else {
-        console.error(red("Err: subcmd not found"));
+        console.error(clr("Err: subcmd not found", "red"));
         Deno.exit(1);
       }
     }
@@ -120,7 +116,7 @@ export default class Dfm {
     const exit_status: { name: string; is_failed: boolean }[] = [];
 
     // LOADED SOURCES
-    console.log(blue(bold("STATUS")));
+    console.log(clr(deco("STATUS", "bold"), "blue"));
     console.log("LOADED SOURCES:");
     this.sources.forEach((s) => {
       console.log(`・${s.info.name}`);
@@ -130,7 +126,7 @@ export default class Dfm {
     // SOURCE's STATUS
     this.sources.forEach((s) => {
       if (s.status != undefined) {
-        console.log(blue(bold(s.info.name.toUpperCase())));
+        console.log(clr(deco(s.info.name.toUpperCase(), "bold"), "blue"));
         const is_failed = s.status();
         exit_status.push({ name: s.info.name, is_failed: is_failed });
       }
@@ -140,10 +136,10 @@ export default class Dfm {
     const noerr =
       exit_status.filter((s) => s.is_failed).length === exit_status.length;
     if (noerr) {
-      console.log(bold(`${green("✔  ")}NO Error was detected`));
+      console.log(deco(`${clr("✔  ", "green")}NO Error was detected`, "bold"));
       return true;
     } else {
-      console.log(`${red("✘  ")}Error was detected`);
+      console.log(`${clr("✘  ", "red")}Error was detected`);
       exit_status.forEach((s) => {
         console.log(`・${s.name}`);
       });
@@ -159,15 +155,15 @@ export default class Dfm {
         exit_status.push({ name: s.info.name, is_failed: is_failed });
       }
     });
-    console.log(blue(bold("STATUS")));
+    console.log(clr(deco("STATUS", "bold"), "blue"));
     const noerr =
       exit_status.filter((s) => s.is_failed).length === exit_status.length;
     if (noerr) {
-      console.log(bold(`${green("✔ ")}NO Error was detected`));
+      console.log(deco(`${clr("✔ ", "green")}NO Error was detected`, "bold"));
       return true;
     } else {
       exit_status.forEach((s) => {
-        console.log(`${red("✘ ")}${s.name}`);
+        console.log(`${clr("✘ ", "red")}${s.name}`);
       });
       return false;
     }
@@ -175,24 +171,24 @@ export default class Dfm {
 
   private cmd_help(_: SubcmdOptions): boolean {
     const p = console.log;
-    p(yellow(bold("dfm(3) v0.1")));
+    p(clr(deco(`dfm(3) ${version}`, "bold"), "yellow"));
     p("	A dotfiles manager written in deno (typescript)\n");
-    p(yellow(bold("USAGE:")));
+    p(clr(deco("USAGE:", "bold"), "yellow"));
     p("	deno run -A [filename] [SUBCOMMANDS]\n");
-    p(yellow(bold("SUBCOMMANDS:")));
+    p(clr(deco("SUBCOMMANDS:", "bold"), "yellow"));
     this.subcmds.forEach((c) => {
-      console.log(`	${green(c.name)}	${c.info}`);
+      console.log(`	${clr(c.name, "green")}	${c.info}`);
     });
     return true;
   }
 
   private debug() {
     console.log("\n\n==========DEBUG==========");
-    console.log(blue(bold("OPTIONS")));
+    console.log(clr(deco("OPTIONS", "bold"), "blue"));
     console.dir(this.options);
-    console.log(blue(bold("SOURCES")));
+    console.log(clr(deco("SOURCES", "bold"), "blue"));
     console.dir(this.sources);
-    console.log(blue(bold("BUILTINCMD")));
+    console.log(clr(deco("BUILTINCMD", "bold"), "blue"));
     console.dir(this.subcmds);
     console.log("=========================");
   }

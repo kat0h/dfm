@@ -7,10 +7,7 @@
 
 import { Source, SourceInfo } from "../main.ts";
 import { ensureSymlinkSync, fromFileUrl, toFileUrl } from "../deps.ts";
-import { resolve_path } from "../util/mod.ts";
-
-// TODO: USE LOG MODULE INSTEAD OF CONSOLE.LOG
-import { green, red } from "https://deno.land/std@0.145.0/fmt/colors.ts";
+import { clr, resolve_path } from "../util/mod.ts";
 
 export default class Symlink implements Source {
   // links[n][0]: 実体 links[n][1]: シンボリックリンク
@@ -68,9 +65,9 @@ function check_symlinks(links: { from: URL; to: URL }[]): boolean {
     if (!ok) {
       stat = false;
       console.log(
-        `${ok ? green("✔ ") : red("✘ ")} ${fromFileUrl(link.from)} → ${
-          fromFileUrl(link.to)
-        }`,
+        `${ok ? clr("✔ ", "green") : clr("✘ ", "red")} ${
+          fromFileUrl(link.from)
+        } → ${fromFileUrl(link.to)}`,
       );
     }
   });
@@ -107,7 +104,7 @@ function ensure_make_symlinks(links: { from: URL; to: URL }[]): void {
     const from = link.from.pathname;
     const to = link.to.pathname;
     if (!check_symlink(link)) {
-      console.log(`${green("✔ ")} ${from} -> ${to}`);
+      console.log(`${clr("✔ ", "green")} ${from} -> ${to}`);
       ensureSymlinkSync(from, to);
       // } else {
       // console.log(`${green("✔ ")} ${to}`);
