@@ -1,5 +1,5 @@
 import { parse } from "./deps.ts";
-export {
+import {
   blue,
   bold,
   green,
