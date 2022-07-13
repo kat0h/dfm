@@ -1,6 +1,8 @@
 import { colors, parse } from "./deps.ts";
 const { blue, bold, green, red, yellow, setColorEnabled } = colors;
 
+const version = "v0.3"
+
 export interface Plugin {
   info: PluginInfo;
   // souces must returns exit status
@@ -171,7 +173,7 @@ export default class Dfm {
 
   private cmd_help(_: SubcmdOptions): boolean {
     const p = console.log;
-    p(yellow(bold("dfm(3) v0.1")));
+    p(yellow(bold(`dfm(3) ${version}`)));
     p("	A dotfiles manager written in deno (typescript)\n");
     p(yellow(bold("USAGE:")));
     p("	deno run -A [filename] [SUBCOMMANDS]\n");
