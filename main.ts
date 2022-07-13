@@ -116,14 +116,6 @@ export default class Dfm {
   private async cmd_status(_: SubcmdOptions): Promise<boolean> {
     const exit_status: { name: string; is_failed: boolean }[] = [];
 
-    // LOADED SOURCES
-    console.log(blue(bold("STATUS")));
-    console.log("LOADED SOURCES:");
-    this.sources.forEach((s) => {
-      console.log(`・${s.info.name}`);
-    });
-    console.log();
-
     // SOURCE's STATUS
     for (const s of this.sources) {
       if (s.status != undefined) {
@@ -138,12 +130,14 @@ export default class Dfm {
       exit_status.filter((s) => s.is_failed).length === exit_status.length;
     console.log();
     if (noerr) {
-      console.log(bold(`${green("✔  ")}NO Error was detected`));
+      console.log(bold(green("✔  NO Error was detected")));
       return true;
     } else {
-      console.log(`${red("✘  ")}Error was detected`);
+      console.log(bold(red("✘  Error was detected")));
       exit_status.forEach((s) => {
-        console.log(`・${s.name}`);
+        if (s.is_failed) {
+          console.log(`・${s.name}`);
+        }
       });
       return false;
     }
@@ -162,11 +156,14 @@ export default class Dfm {
     const noerr =
       exit_status.filter((s) => s.is_failed).length === exit_status.length;
     if (noerr) {
-      console.log(bold(`${green("✔ ")}NO Error was detected`));
+      console.log(bold(`${green("✔  ")}NO Error was detected`));
       return true;
     } else {
+      console.log(bold("Error was detected"));
       exit_status.forEach((s) => {
-        console.log(`${red("✘ ")}${s.name}`);
+        if (s.is_failed) {
+          console.log(`  ${red("✘  ")}${s.name}`);
+        }
       });
       return false;
     }

@@ -66,14 +66,14 @@ function check_symlinks(links: { from: URL; to: URL }[]): boolean {
     if (!ok) {
       stat = false;
       console.log(
-        `${ok ? green("✔ ") : red("✘ ")} ${fromFileUrl(link.from)} → ${
+        `${ok ? green("✔  ") : red("✘  ")} ${fromFileUrl(link.from)} → ${
           fromFileUrl(link.to)
         }`,
       );
     }
   });
   if (stat) {
-    console.log("All symlinks are ok");
+    console.log("OK");
   }
   console.log("");
   return stat;
@@ -105,10 +105,8 @@ function ensure_make_symlinks(links: { from: URL; to: URL }[]): void {
     const from = link.from.pathname;
     const to = link.to.pathname;
     if (!check_symlink(link)) {
-      console.log(`${green("✔ ")} ${from} -> ${to}`);
+      console.log(`${green("✔  ")} ${from} → ${to}`);
       ensureSymlinkSync(from, to);
-      // } else {
-      // console.log(`${green("✔ ")} ${to}`);
     }
   });
 }
