@@ -5,9 +5,9 @@ export interface Source {
   info: SourceInfo;
   // souces must returns exit status
   // if the process failed, the function returns false
-  status?: () => boolean;
-  update?: () => boolean;
-  subcmd?: (options: SubcmdOptions) => boolean;
+  status?: () => boolean | Promise<boolean>;
+  update?: () => boolean | Promise<boolean>;
+  subcmd?: (options: SubcmdOptions) => boolean | Promise<boolean>;
 }
 
 export interface SourceInfo {
@@ -20,7 +20,7 @@ export interface SourceInfo {
 type Subcmd = {
   name: string;
   info: string;
-  func: (options: SubcmdOptions) => boolean;
+  func: (options: SubcmdOptions) => boolean | Promise<boolean>;
 };
 
 interface Options {
@@ -64,7 +64,7 @@ export default class Dfm {
     return this;
   }
 
-  end() {
+  async end() {
     if (!Deno.isatty(Deno.stdout.rid)) {
       setColorEnabled(false);
     }
@@ -76,7 +76,7 @@ export default class Dfm {
       // check builtincmd
       const cmd = this.subcmds.find((sc: Subcmd) => sc.name === subcmd.name);
       if (cmd !== undefined) {
-        const status = cmd.func(subcmd);
+        const status = await cmd.func(subcmd);
         if (!status) {
           Deno.exit(1);
         }
@@ -113,7 +113,7 @@ export default class Dfm {
     };
   }
 
-  private cmd_status(_: SubcmdOptions): boolean {
+  private async cmd_status(_: SubcmdOptions): Promise<boolean> {
     const exit_status: { name: string; is_failed: boolean }[] = [];
 
     // LOADED SOURCES
@@ -125,13 +125,13 @@ export default class Dfm {
     console.log();
 
     // SOURCE's STATUS
-    this.sources.forEach((s) => {
+    for (const s of this.sources) {
       if (s.status != undefined) {
         console.log(blue(bold(s.info.name.toUpperCase())));
-        const is_failed = s.status();
+        const is_failed = await s.status();
         exit_status.push({ name: s.info.name, is_failed: is_failed });
       }
-    });
+    }
 
     // CHECK ERROR
     const noerr =
@@ -149,14 +149,15 @@ export default class Dfm {
     }
   }
 
-  private cmd_update(_: SubcmdOptions): boolean {
+  private async cmd_update(_: SubcmdOptions): Promise<boolean> {
     const exit_status: { name: string; is_failed: boolean }[] = [];
-    this.sources.forEach((s) => {
+    for (const s of this.sources) {
       if (s.update != undefined) {
-        const is_failed = s.update();
+        console.log(blue(bold(s.info.name.toUpperCase())));
+        const is_failed = await s.update();
         exit_status.push({ name: s.info.name, is_failed: is_failed });
       }
-    });
+    }
     console.log(blue(bold("STATUS")));
     const noerr =
       exit_status.filter((s) => s.is_failed).length === exit_status.length;
