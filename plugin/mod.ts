@@ -1,3 +1,4 @@
 import Symlink from "./symlink.ts";
+import CmdCheck from "./cmdcheck.ts";
 
-export { Symlink };
+export { CmdCheck, Symlink };

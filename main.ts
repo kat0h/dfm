@@ -1,11 +1,5 @@
-import { parse } from "./deps.ts";
-import {
-  blue,
-  bold,
-  green,
-  red,
-  yellow,
-} from "https://deno.land/std@0.145.0/fmt/colors.ts";
+import { colors, parse } from "./deps.ts";
+const { blue, bold, green, red, yellow, setColorEnabled } = colors;
 
 export interface Source {
   info: SourceInfo;
@@ -71,6 +65,9 @@ export default class Dfm {
   }
 
   end() {
+    if (!Deno.isatty(Deno.stdout.rid)) {
+      setColorEnabled(false);
+    }
     // exec subcmd
     if (this.options.subcmd === undefined) {
       this.cmd_help({ name: "help", args: { _: [] } });
@@ -139,6 +136,7 @@ export default class Dfm {
     // CHECK ERROR
     const noerr =
       exit_status.filter((s) => s.is_failed).length === exit_status.length;
+    console.log();
     if (noerr) {
       console.log(bold(`${green("✔  ")}NO Error was detected`));
       return true;

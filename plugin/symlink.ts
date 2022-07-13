@@ -6,11 +6,9 @@
 // ・リンクを貼る
 
 import { Source, SourceInfo } from "../main.ts";
-import { ensureSymlinkSync, fromFileUrl, toFileUrl } from "../deps.ts";
+import { colors, ensureSymlinkSync, fromFileUrl, toFileUrl } from "../deps.ts";
 import { resolve_path } from "../util/mod.ts";
-
-// TODO: USE LOG MODULE INSTEAD OF CONSOLE.LOG
-import { green, red } from "https://deno.land/std@0.145.0/fmt/colors.ts";
+const { green, red } = colors;
 
 export default class Symlink implements Source {
   // links[n][0]: 実体 links[n][1]: シンボリックリンク
