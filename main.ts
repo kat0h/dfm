@@ -1,8 +1,8 @@
 import { colors, parse } from "./deps.ts";
 const { blue, bold, green, red, yellow, setColorEnabled } = colors;
 
-export interface Source {
-  info: SourceInfo;
+export interface Plugin {
+  info: PluginInfo;
   // souces must returns exit status
   // if the process failed, the function returns false
   status?: () => boolean | Promise<boolean>;
@@ -10,7 +10,7 @@ export interface Source {
   subcmd?: (options: SubcmdOptions) => boolean | Promise<boolean>;
 }
 
-export interface SourceInfo {
+export interface PluginInfo {
   name: string;
   subcmd?: {
     info: string;
@@ -35,7 +35,7 @@ export interface SubcmdOptions {
 
 export default class Dfm {
   private options: Options;
-  private sources: Source[] = [];
+  private sources: Plugin[] = [];
   private subcmds: Subcmd[];
 
   constructor() {
@@ -51,7 +51,7 @@ export default class Dfm {
     ];
   }
 
-  use(source: Source) {
+  use(source: Plugin) {
     this.sources.push(source);
     // if the source has subcmd
     if (source.info.subcmd != undefined && source.subcmd != undefined) {

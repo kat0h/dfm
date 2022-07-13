@@ -5,17 +5,17 @@
 // ・権限を持っているかを確かめる
 // ・リンクを貼る
 
-import { Source, SourceInfo } from "../main.ts";
+import { Plugin, PluginInfo } from "../main.ts";
 import { colors, ensureSymlinkSync, fromFileUrl, toFileUrl } from "../deps.ts";
 import { resolve_path } from "../util/mod.ts";
 const { green, red } = colors;
 
-export default class Symlink implements Source {
+export default class Symlink implements Plugin {
   // links[n][0]: 実体 links[n][1]: シンボリックリンク
   private links: { from: URL; to: URL }[] = [];
   private dotfiles_dir: string;
 
-  info: SourceInfo = {
+  info: PluginInfo = {
     name: "symlink",
     subcmd: {
       info: "make symlinks",

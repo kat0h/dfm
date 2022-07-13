@@ -1,9 +1,9 @@
-import { Source, SourceInfo } from "../main.ts";
+import { Plugin, PluginInfo } from "../main.ts";
 
-export default class CmdCheck implements Source {
+export default class CmdCheck implements Plugin {
   private cmds: string[] = [];
 
-  info: SourceInfo = {
+  info: PluginInfo = {
     name: "cmdcheck",
   };
 
