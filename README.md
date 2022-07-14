@@ -35,5 +35,4 @@ c.cmd([
 dfm.use(s);
 dfm.use(c);
 dfm.end();
-// vim:filetype=typescript
 ```
