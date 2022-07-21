@@ -1,4 +1,4 @@
-import { Plugin, PluginInfo } from "../types.ts.ts";
+import { Plugin, PluginInfo } from "../types.ts";
 import { colors } from "../deps.ts";
 const { green, red } = colors;
 
