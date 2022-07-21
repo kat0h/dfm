@@ -31,6 +31,13 @@ export default class Symlink implements Plugin {
     return stat;
   }
 
+  list() {
+    this.links.forEach((link) => {
+      console.log(`・ ${link.from.pathname} → ${link.to.pathname}`)
+    })
+    return true;
+  }
+
   sync() {
     // リンクが存在していなければ貼る
     ensure_make_symlinks(this.links);
@@ -60,7 +67,7 @@ function check_symlinks(links: { from: URL; to: URL }[]): boolean {
     if (!ok) {
       stat = false;
       console.log(
-        `${ok ? green("✔  ") : red("✘  ")} ${fromFileUrl(link.from)} → ${
+        `・ ${ok ? green("✔  ") : red("✘  ")} ${fromFileUrl(link.from)} → ${
           fromFileUrl(link.to)
         }`,
       );
@@ -69,7 +76,6 @@ function check_symlinks(links: { from: URL; to: URL }[]): boolean {
   if (stat) {
     console.log("OK");
   }
-  console.log("");
   return stat;
 }
 
@@ -100,7 +106,7 @@ function ensure_make_symlinks(links: { from: URL; to: URL }[]): void {
     const to = link.to.pathname;
     ensureDirSync(dirname(to));
     if (!check_symlink(link)) {
-      console.log(`${green("✔  ")} ${from} → ${to}`);
+      console.log(`・ ${green("✔  ")} ${from} → ${to}`);
       ensureSymlinkSync(from, to);
     }
   });

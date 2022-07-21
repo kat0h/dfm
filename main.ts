@@ -1,7 +1,7 @@
 import { colors, parse } from "./deps.ts";
 import { Options, Plugin, Subcmd, SubcmdOptions } from "./types.ts";
 import { isatty } from "./util/util.ts";
-const { blue, bold, green, red, yellow, setColorEnabled } = colors;
+const { blue, bold, green, red, yellow, setColorEnabled, inverse } = colors;
 
 const version = "v0.3";
 
@@ -17,15 +17,28 @@ export default class Dfm {
       {
         // 状態を確認する
         name: "stat",
-        info: "show status",
+        info: "show status of settings",
         func: (options: SubcmdOptions) => {
           return this.cmd_base.bind(this)(options, "stat");
         },
       },
       {
+        name: "list",
+        info: "show list of settings",
+        func: (options: SubcmdOptions) => {
+          // プラグインの一覧を表示
+          console.log(inverse(blue(bold("PLUGINS"))));
+          this.plugins.forEach((plugin) => {
+            console.log(`・ ${plugin.info.name}`)
+          })
+          console.log()
+          return this.cmd_base.bind(this)(options, "list");
+        }
+      },
+      {
         // 設定を同期する
         name: "sync",
-        info: "keep up to date",
+        info: "apply settings",
         func: (options: SubcmdOptions) => {
           return this.cmd_base.bind(this)(options, "sync");
         },
@@ -76,7 +89,7 @@ export default class Dfm {
         }
       } else {
         // サブコマンドが見つからない場合、プロセスを終了する
-        console.error(bold(red("Err: subcmd not found")));
+        console.log(bold(red("Err: subcmd not found")));
         Deno.exit(1);
       }
     }
@@ -84,23 +97,22 @@ export default class Dfm {
 
   private async cmd_base(
     _: SubcmdOptions,
-    func: "stat" | "sync",
+    func: "stat" | "sync" | "list",
   ): Promise<boolean> {
-    // statとsyncは性質が似ているため、処理を共通化している
+    // statとlist, syncは性質が似ているため、処理を共通化している
 
     const exit_status: { name: string; is_failed: boolean }[] = [];
     for (const s of this.plugins) {
       const command = s[func];
       if (command != undefined) {
-        console.log(blue(bold(s.info.name.toUpperCase())));
-        const is_failed = await command.bind(s)();
+        console.log(inverse(blue(bold(s.info.name.toUpperCase()))));
+        const is_failed = !(await command.bind(s)());
+        console.log()
         exit_status.push({ name: s.info.name, is_failed: is_failed });
       }
     }
 
-    const noerr =
-      exit_status.filter((s) => s.is_failed).length === exit_status.length;
-    console.log();
+    const noerr = exit_status.filter((s) => s.is_failed).length === 0;
     if (noerr) {
       console.log(bold(green("✔  NO Error was detected")));
       return true;
@@ -119,11 +131,11 @@ export default class Dfm {
     // ヘルプ
 
     const p = console.log;
-    p(yellow(bold(`dfm(3) ${version}`)));
+    p(inverse(yellow(bold(`dfm(3) ${version}`))));
     p("	A dotfiles manager written in deno (typescript)\n");
-    p(yellow(bold("USAGE:")));
+    p(inverse(yellow(bold("USAGE:"))));
     p("	deno run -A [filename] [SUBCOMMANDS]\n");
-    p(yellow(bold("SUBCOMMANDS:")));
+    p(inverse(yellow(bold("SUBCOMMANDS:"))));
     this.subcmds.forEach((c) => {
       console.log(`	${green(c.name)}	${c.info}`);
     });

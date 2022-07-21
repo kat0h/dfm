@@ -5,6 +5,7 @@ export interface Plugin {
   // souces must returns exit status
   // if the process failed, the function returns false
   stat?: () => boolean | Promise<boolean>;
+  list?: () => boolean | Promise<boolean>;
   sync?: () => boolean | Promise<boolean>;
   subcmd?: (options: SubcmdOptions) => boolean | Promise<boolean>;
 }

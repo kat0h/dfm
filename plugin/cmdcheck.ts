@@ -49,6 +49,11 @@ export default class CmdCheck implements Plugin {
     }
   }
 
+  list() {
+    console.log(`${this.cmds}`);
+    return true;
+  }
+
   cmd(cmds: string[]) {
     cmds.forEach((cmd) => {
       this.cmds.push(cmd);
