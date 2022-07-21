@@ -2,6 +2,7 @@ import { Plugin, PluginInfo } from "../types.ts";
 import { colors } from "../deps.ts";
 const { green, red } = colors;
 
+// コマンドの存在を command -v を用いてチェックします
 export default class CmdCheck implements Plugin {
   private cmds: string[] = [];
 

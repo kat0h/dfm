@@ -1,10 +1,3 @@
-// TODO: ディレクトリを掘る
-//
-// リンクを配置する手順
-// ・配置するディレクトリが存在するか確かめる
-// ・権限を持っているかを確かめる
-// ・リンクを貼る
-
 import { Plugin, PluginInfo } from "../types.ts";
 import { colors, ensureSymlinkSync, fromFileUrl, toFileUrl } from "../deps.ts";
 import { resolve_path } from "../util/mod.ts";
@@ -33,19 +26,20 @@ export default class Symlink implements Plugin {
   }
 
   stat() {
-    // Symlinkがきちんと貼られているか確認
+    // link()で指定されたリンクが正常に貼られているかを確認
     const stat = check_symlinks(this.links);
     return stat;
   }
 
   sync() {
+    // リンクが存在していなければ貼る
     ensure_make_symlinks(this.links);
     console.log("OK");
     return true;
   }
 
-  // 作成するシンボリックリンクを登録
   link(links: [string, string][]) {
+    // 作成するシンボリックリンクを登録
     links.forEach((link) => {
       const from_url = toFileUrl(
         resolve_path(link[0], this.dotfiles_dir),
