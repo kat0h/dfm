@@ -1,7 +1,7 @@
 import { colors, parse } from "./deps.ts";
 const { blue, bold, green, red, yellow, setColorEnabled } = colors;
 
-const version = "v0.3"
+const version = "v0.3";
 
 export interface Plugin {
   info: PluginInfo;
@@ -122,7 +122,7 @@ export default class Dfm {
     for (const s of this.sources) {
       if (s.status != undefined) {
         console.log(blue(bold(s.info.name.toUpperCase())));
-        const is_failed = await s.status();
+        const is_failed = await s['status']();
         exit_status.push({ name: s.info.name, is_failed: is_failed });
       }
     }
@@ -150,7 +150,7 @@ export default class Dfm {
     for (const s of this.sources) {
       if (s.update != undefined) {
         console.log(blue(bold(s.info.name.toUpperCase())));
-        const is_failed = await s.update();
+        const is_failed = await s['update']();
         exit_status.push({ name: s.info.name, is_failed: is_failed });
       }
     }
