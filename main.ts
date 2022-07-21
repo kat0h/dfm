@@ -1,39 +1,8 @@
 import { colors, parse } from "./deps.ts";
+import { Options, Plugin, Subcmd, SubcmdOptions } from "./types.ts";
 const { blue, bold, green, red, yellow, setColorEnabled } = colors;
 
 const version = "v0.3";
-
-export interface Plugin {
-  info: PluginInfo;
-  // souces must returns exit status
-  // if the process failed, the function returns false
-  status?: () => boolean | Promise<boolean>;
-  update?: () => boolean | Promise<boolean>;
-  subcmd?: (options: SubcmdOptions) => boolean | Promise<boolean>;
-}
-
-export interface PluginInfo {
-  name: string;
-  subcmd?: {
-    info: string;
-  };
-}
-
-type Subcmd = {
-  name: string;
-  info: string;
-  func: (options: SubcmdOptions) => boolean | Promise<boolean>;
-};
-
-interface Options {
-  subcmd?: SubcmdOptions;
-  debug: boolean;
-}
-
-export interface SubcmdOptions {
-  name: string;
-  args: ReturnType<typeof parse>;
-}
 
 export default class Dfm {
   private options: Options;
@@ -122,7 +91,7 @@ export default class Dfm {
     for (const s of this.sources) {
       if (s.status != undefined) {
         console.log(blue(bold(s.info.name.toUpperCase())));
-        const is_failed = await s['status']();
+        const is_failed = await s["status"]();
         exit_status.push({ name: s.info.name, is_failed: is_failed });
       }
     }
@@ -150,7 +119,7 @@ export default class Dfm {
     for (const s of this.sources) {
       if (s.update != undefined) {
         console.log(blue(bold(s.info.name.toUpperCase())));
-        const is_failed = await s['update']();
+        const is_failed = await s["update"]();
         exit_status.push({ name: s.info.name, is_failed: is_failed });
       }
     }

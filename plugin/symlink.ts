@@ -5,7 +5,7 @@
 // ・権限を持っているかを確かめる
 // ・リンクを貼る
 
-import { Plugin, PluginInfo } from "../main.ts";
+import { Plugin, PluginInfo } from "../types.ts";
 import { colors, ensureSymlinkSync, fromFileUrl, toFileUrl } from "../deps.ts";
 import { resolve_path } from "../util/mod.ts";
 const { green, red } = colors;

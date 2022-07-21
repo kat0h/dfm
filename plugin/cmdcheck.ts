@@ -1,5 +1,5 @@
-import { Plugin, PluginInfo } from "../main.ts";
-import { colors } from "../deps.ts"
+import { Plugin, PluginInfo } from "../types.ts.ts";
+import { colors } from "../deps.ts";
 const { green, red } = colors;
 
 export default class CmdCheck implements Plugin {
@@ -10,10 +10,18 @@ export default class CmdCheck implements Plugin {
   };
 
   async status() {
-    const p: {cmd: string, promise: Promise<Deno.ProcessStatus>}[] = [];
+    const p: { cmd: string; promise: Promise<Deno.ProcessStatus> }[] = [];
     this.cmds.forEach((cmd) => {
-      p.push({cmd: cmd,promise: Deno.run({cmd: ["command", "-v", cmd],stdin: "null",stdout: "null",stderr: "null"}).status()});
-    })
+      p.push({
+        cmd: cmd,
+        promise: Deno.run({
+          cmd: ["command", "-v", cmd],
+          stdin: "null",
+          stdout: "null",
+          stderr: "null",
+        }).status(),
+      });
+    });
 
     const succe: string[] = [];
     const fails: string[] = [];

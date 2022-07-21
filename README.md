@@ -3,6 +3,7 @@
 ![](https://user-images.githubusercontent.com/45391880/175961680-875ae156-41ce-417c-99f7-a3deaf1d0516.png)
 
 Example:
+
 ```typescript
 #!/usr/bin/env deno run -A
 import Dfm from "https://deno.land/x/dfm/mod.ts";
@@ -29,8 +30,8 @@ c.cmd([
   "clang",
   "curl",
   "wget",
-  "hoge"
-])
+  "hoge",
+]);
 
 dfm.use(s);
 dfm.use(c);
