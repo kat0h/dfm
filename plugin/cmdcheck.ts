@@ -9,7 +9,7 @@ export default class CmdCheck implements Plugin {
     name: "cmdcheck",
   };
 
-  async status() {
+  async stat() {
     const p: { cmd: string; promise: Promise<Deno.ProcessStatus> }[] = [];
     this.cmds.forEach((cmd) => {
       p.push({

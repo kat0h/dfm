@@ -1,102 +1,103 @@
 import { colors, parse } from "./deps.ts";
 import { Options, Plugin, Subcmd, SubcmdOptions } from "./types.ts";
+import { isatty } from "./util/util.ts";
 const { blue, bold, green, red, yellow, setColorEnabled } = colors;
 
 const version = "v0.3";
 
 export default class Dfm {
   private options: Options;
-  private sources: Plugin[] = [];
+  private plugins: Plugin[] = [];
   private subcmds: Subcmd[];
 
   constructor() {
-    this.options = this.parse_argment(Deno.args);
+    this.options = parse_argment(Deno.args);
+    // サブコマンドの定義
     this.subcmds = [
-      { name: "status", info: "show status", func: this.cmd_status.bind(this) },
       {
-        name: "update",
-        info: "keep up to date",
-        func: this.cmd_update.bind(this),
+        // 状態を確認する
+        name: "stat",
+        info: "show status",
+        func: (options: SubcmdOptions) => {
+          return this.cmd_base.bind(this)(options, "stat");
+        },
       },
-      { name: "help", info: "show this help", func: this.cmd_help.bind(this) },
+      {
+        // 設定を同期する
+        name: "sync",
+        info: "keep up to date",
+        func: (options: SubcmdOptions) => {
+          return this.cmd_base.bind(this)(options, "sync");
+        },
+      },
+      {
+        // ヘルプを表示する
+        name: "help",
+        info: "show this help",
+        func: this.cmd_help.bind(this)
+      },
     ];
   }
 
-  use(source: Plugin) {
-    this.sources.push(source);
-    // if the source has subcmd
-    if (source.info.subcmd != undefined && source.subcmd != undefined) {
+  use(plugin: Plugin) {
+    // プラグインを登録する
+
+    this.plugins.push(plugin);
+    // もしプラグインがサブコマンドを実装していた場合、サブコマンドを登録する
+    if (plugin.info.subcmd != undefined && plugin.subcmd != undefined) {
       this.subcmds.push({
-        name: source.info.name,
-        info: source.info.subcmd.info,
-        func: source.subcmd.bind(source),
+        name: plugin.info.name,
+        info: plugin.info.subcmd.info,
+        func: plugin.subcmd.bind(plugin),
       });
     }
     return this;
   }
 
   async end() {
-    if (!Deno.isatty(Deno.stdout.rid)) {
+    // コマンドを実行する
+
+    // もし他のコマンドにパイプされていた場合、エスケープシーケンスを利用しない
+    if (!isatty()) {
       setColorEnabled(false);
     }
-    // exec subcmd
+    // サブコマンドを実行
     if (this.options.subcmd === undefined) {
+      // 無引数で呼ばれた場合、ヘルプを表示する
       this.cmd_help({ name: "help", args: { _: [] } });
     } else {
       const subcmd = this.options.subcmd;
-      // check builtincmd
       const cmd = this.subcmds.find((sc: Subcmd) => sc.name === subcmd.name);
       if (cmd !== undefined) {
         const status = await cmd.func(subcmd);
         if (!status) {
+          // コマンドの実行に失敗した場合、プロセスを終了する
           Deno.exit(1);
         }
       } else {
-        console.error(red("Err: subcmd not found"));
+        // サブコマンドが見つからない場合、プロセスを終了する
+        console.error(bold(red("Err: subcmd not found")));
         Deno.exit(1);
       }
     }
-    if (this.options.debug) this.debug();
   }
 
-  private parse_argment(args: typeof Deno.args): Options {
-    const parsedargs = parse(args);
+  private async cmd_base(
+    _: SubcmdOptions,
+    func: "stat" | "sync",
+  ): Promise<boolean> {
+    // statとsyncは性質が似ているため、処理を共通化している
 
-    let debug = false;
-    if (parsedargs.debug === true) {
-      delete parsedargs.debug;
-      debug = true;
-    }
-
-    let subcmd: SubcmdOptions | undefined = undefined;
-    if (parsedargs._.length !== 0) {
-      const name = parsedargs._[0].toString();
-      parsedargs._.shift();
-      subcmd = {
-        name: name,
-        args: parsedargs,
-      };
-    }
-
-    return {
-      debug: debug,
-      subcmd: subcmd,
-    };
-  }
-
-  private async cmd_status(_: SubcmdOptions): Promise<boolean> {
     const exit_status: { name: string; is_failed: boolean }[] = [];
-
-    // SOURCE's STATUS
-    for (const s of this.sources) {
-      if (s.status != undefined) {
+    for (const s of this.plugins) {
+      const command = s[func];
+      if (command != undefined) {
         console.log(blue(bold(s.info.name.toUpperCase())));
-        const is_failed = await s["status"]();
+        const is_failed = await command.bind(s)();
         exit_status.push({ name: s.info.name, is_failed: is_failed });
       }
     }
 
-    // CHECK ERROR
     const noerr =
       exit_status.filter((s) => s.is_failed).length === exit_status.length;
     console.log();
@@ -114,33 +115,9 @@ export default class Dfm {
     }
   }
 
-  private async cmd_update(_: SubcmdOptions): Promise<boolean> {
-    const exit_status: { name: string; is_failed: boolean }[] = [];
-    for (const s of this.sources) {
-      if (s.update != undefined) {
-        console.log(blue(bold(s.info.name.toUpperCase())));
-        const is_failed = await s["update"]();
-        exit_status.push({ name: s.info.name, is_failed: is_failed });
-      }
-    }
-    console.log(blue(bold("STATUS")));
-    const noerr =
-      exit_status.filter((s) => s.is_failed).length === exit_status.length;
-    if (noerr) {
-      console.log(bold(`${green("✔  ")}NO Error was detected`));
-      return true;
-    } else {
-      console.log(bold("Error was detected"));
-      exit_status.forEach((s) => {
-        if (s.is_failed) {
-          console.log(`  ${red("✘  ")}${s.name}`);
-        }
-      });
-      return false;
-    }
-  }
-
   private cmd_help(_: SubcmdOptions): boolean {
+    // ヘルプ
+
     const p = console.log;
     p(yellow(bold(`dfm(3) ${version}`)));
     p("	A dotfiles manager written in deno (typescript)\n");
@@ -152,15 +129,25 @@ export default class Dfm {
     });
     return true;
   }
-
-  private debug() {
-    console.log("\n\n==========DEBUG==========");
-    console.log(blue(bold("OPTIONS")));
-    console.dir(this.options);
-    console.log(blue(bold("SOURCES")));
-    console.dir(this.sources);
-    console.log(blue(bold("BUILTINCMD")));
-    console.dir(this.subcmds);
-    console.log("=========================");
-  }
 }
+
+function parse_argment(args: typeof Deno.args): Options {
+  // コマンドライン引数を解析
+
+  const parsedargs = parse(args);
+
+  let subcmd: SubcmdOptions | undefined = undefined;
+  if (parsedargs._.length !== 0) {
+    const name = parsedargs._[0].toString();
+    parsedargs._.shift();
+    subcmd = {
+      name: name,
+      args: parsedargs,
+    };
+  }
+
+  return {
+    subcmd: subcmd,
+  };
+}
+

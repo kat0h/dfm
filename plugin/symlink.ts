@@ -32,15 +32,15 @@ export default class Symlink implements Plugin {
     }
   }
 
-  status() {
+  stat() {
     // Symlinkがきちんと貼られているか確認
     const stat = check_symlinks(this.links);
     return stat;
   }
 
-  update() {
+  sync() {
     ensure_make_symlinks(this.links);
-    console.log();
+    console.log("OK");
     return true;
   }
 

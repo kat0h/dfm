@@ -28,3 +28,7 @@ export function resolve_path(path: string, basedir?: string): string {
     return resolve("", expand_tilde(path));
   }
 }
+
+export function isatty(): boolean {
+  return Deno.isatty(Deno.stdout.rid);
+}
