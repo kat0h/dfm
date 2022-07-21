@@ -52,19 +52,20 @@ export default class Dfm {
     ];
   }
 
-  use(plugin: Plugin) {
+  use(...plugins: Plugin[]) {
     // プラグインを登録する
 
-    this.plugins.push(plugin);
-    // もしプラグインがサブコマンドを実装していた場合、サブコマンドを登録する
-    if (plugin.info.subcmd != undefined && plugin.subcmd != undefined) {
-      this.subcmds.push({
-        name: plugin.info.name,
-        info: plugin.info.subcmd.info,
-        func: plugin.subcmd.bind(plugin),
-      });
-    }
-    return this;
+    plugins.forEach((plugin) => {
+      this.plugins.push(plugin);
+      // もしプラグインがサブコマンドを実装していた場合、サブコマンドを登録する
+      if (plugin.info.subcmd != undefined && plugin.subcmd != undefined) {
+        this.subcmds.push({
+          name: plugin.info.name,
+          info: plugin.info.subcmd.info,
+          func: plugin.subcmd.bind(plugin),
+        });
+      }
+    })
   }
 
   async end() {
