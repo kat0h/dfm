@@ -1,5 +1,5 @@
 import { Plugin, PluginInfo } from "../types.ts";
-import { colors, ensureSymlinkSync, fromFileUrl, toFileUrl } from "../deps.ts";
+import { colors, ensureSymlinkSync, fromFileUrl, toFileUrl, dirname, ensureDirSync } from "../deps.ts";
 import { resolve_path } from "../util/mod.ts";
 const { green, red } = colors;
 
@@ -98,6 +98,7 @@ function ensure_make_symlinks(links: { from: URL; to: URL }[]): void {
   links.forEach((link) => {
     const from = link.from.pathname;
     const to = link.to.pathname;
+    ensureDirSync(dirname(to));
     if (!check_symlink(link)) {
       console.log(`${green("✔  ")} ${from} → ${to}`);
       ensureSymlinkSync(from, to);
