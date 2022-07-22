@@ -9,16 +9,19 @@ export default class Git implements Plugin {
   }
   info: PluginInfo = {
     name: "git",
-    subcmd: {
-      name: "git",
-      info: "run git command in dotfiles directory",
-    },
+    subcmd: [
+      {
+        name: "git",
+        info: "run git command in dotfiles directory",
+        func: this.subcmd,
+      },
+    ],
   };
   async subcmd(options: SubcmdOptions) {
     await Deno.run({
-      cmd: [ "git", ...options.args ],
-      cwd: this.dotfiles_dir
-    }).status()
+      cmd: ["git", ...options.args],
+      cwd: this.dotfiles_dir,
+    }).status();
     return true;
   }
 }

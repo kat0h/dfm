@@ -34,5 +34,5 @@ export function isatty(): boolean {
 }
 
 export function os(): typeof Deno.build.os {
-  return Deno.build.os
+  return Deno.build.os;
 }

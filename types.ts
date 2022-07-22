@@ -5,15 +5,11 @@ export interface Plugin {
   stat?: () => boolean | Promise<boolean>;
   list?: () => boolean | Promise<boolean>;
   sync?: () => boolean | Promise<boolean>;
-  subcmd?: (options: SubcmdOptions) => boolean | Promise<boolean>;
 }
 
 export interface PluginInfo {
   name: string;
-  subcmd?: {
-    name: string;
-    info: string;
-  };
+  subcmd?: Subcmd[];
 }
 
 export type Subcmd = {

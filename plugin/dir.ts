@@ -10,10 +10,13 @@ export default class Dir implements Plugin {
   }
   info: PluginInfo = {
     name: "dir",
-    subcmd: {
-      name: "dir",
-      info: "print dotfiles dir",
-    },
+    subcmd: [
+      {
+        name: "dir",
+        info: "print dotfiles dir",
+        func: this.subcmd,
+      },
+    ],
   };
   list() {
     console.log(this.dotfiles_dir);

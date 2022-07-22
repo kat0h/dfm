@@ -1,1 +1,1 @@
-export { expand_tilde, isatty, resolve_path, os } from "./util.ts";
+export { expand_tilde, isatty, os, resolve_path } from "./util.ts";

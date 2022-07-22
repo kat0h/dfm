@@ -57,12 +57,13 @@ export default class Dfm {
 
     plugins.forEach((plugin) => {
       this.plugins.push(plugin);
-      // もしプラグインがサブコマンドを実装していた場合、サブコマンドを登録する
-      if (plugin.info.subcmd != undefined && plugin.subcmd != undefined) {
-        this.subcmds.push({
-          name: plugin.info.subcmd.name,
-          info: plugin.info.subcmd.info,
-          func: plugin.subcmd.bind(plugin),
+      if (plugin.info.subcmd !== undefined) {
+        plugin.info.subcmd.forEach((subcmd) => {
+          this.subcmds.push({
+            name: subcmd.name,
+            info: subcmd.info,
+            func: subcmd.func.bind(plugin),
+          });
         });
       }
     });
