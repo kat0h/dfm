@@ -1,12 +1,12 @@
-import { colors, parse } from "./deps.ts";
-import { Options, Plugin, Subcmd, SubcmdOptions } from "./types.ts";
+import { colors } from "./deps.ts";
+import { DfmOptions, Plugin, Subcmd, SubcmdOptions } from "./types.ts";
 import { isatty } from "./util/util.ts";
 const { blue, bold, green, red, yellow, setColorEnabled, inverse } = colors;
 
 const version = "v0.3";
 
 export default class Dfm {
-  private options: Options;
+  private options: DfmOptions;
   private plugins: Plugin[] = [];
   private subcmds: Subcmd[];
 
@@ -29,11 +29,11 @@ export default class Dfm {
           // プラグインの一覧を表示
           console.log(inverse(blue(bold("PLUGINS"))));
           this.plugins.forEach((plugin) => {
-            console.log(`・ ${plugin.info.name}`)
-          })
-          console.log()
+            console.log(`・ ${plugin.info.name}`);
+          });
+          console.log();
           return this.cmd_base.bind(this)(options, "list");
-        }
+        },
       },
       {
         // 設定を同期する
@@ -47,7 +47,7 @@ export default class Dfm {
         // ヘルプを表示する
         name: "help",
         info: "show this help",
-        func: this.cmd_help.bind(this)
+        func: this.cmd_help.bind(this),
       },
     ];
   }
@@ -60,12 +60,12 @@ export default class Dfm {
       // もしプラグインがサブコマンドを実装していた場合、サブコマンドを登録する
       if (plugin.info.subcmd != undefined && plugin.subcmd != undefined) {
         this.subcmds.push({
-          name: plugin.info.name,
+          name: plugin.info.subcmd.name,
           info: plugin.info.subcmd.info,
           func: plugin.subcmd.bind(plugin),
         });
       }
-    })
+    });
   }
 
   async end() {
@@ -76,11 +76,11 @@ export default class Dfm {
       setColorEnabled(false);
     }
     // サブコマンドを実行
-    if (this.options.subcmd === undefined) {
+    if (this.options.subcmdOptions === undefined) {
       // 無引数で呼ばれた場合、ヘルプを表示する
-      this.cmd_help({ name: "help", args: { _: [] } });
+      this.cmd_help({ name: "help", args: [] });
     } else {
-      const subcmd = this.options.subcmd;
+      const subcmd = this.options.subcmdOptions;
       const cmd = this.subcmds.find((sc: Subcmd) => sc.name === subcmd.name);
       if (cmd !== undefined) {
         const status = await cmd.func(subcmd);
@@ -108,7 +108,7 @@ export default class Dfm {
       if (command != undefined) {
         console.log(inverse(blue(bold(s.info.name.toUpperCase()))));
         const is_failed = !(await command.bind(s)());
-        console.log()
+        console.log();
         exit_status.push({ name: s.info.name, is_failed: is_failed });
       }
     }
@@ -144,23 +144,18 @@ export default class Dfm {
   }
 }
 
-function parse_argment(args: typeof Deno.args): Options {
+function parse_argment(args: typeof Deno.args): DfmOptions {
   // コマンドライン引数を解析
 
-  const parsedargs = parse(args);
-
-  let subcmd: SubcmdOptions | undefined = undefined;
-  if (parsedargs._.length !== 0) {
-    const name = parsedargs._[0].toString();
-    parsedargs._.shift();
-    subcmd = {
-      name: name,
-      args: parsedargs,
+  let subcmdOptions: SubcmdOptions | undefined = undefined;
+  if (args.length !== 0) {
+    subcmdOptions = {
+      name: Deno.args[0],
+      args: Deno.args.slice(1),
     };
   }
 
   return {
-    subcmd: subcmd,
+    subcmdOptions: subcmdOptions,
   };
 }
-

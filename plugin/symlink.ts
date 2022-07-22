@@ -1,5 +1,12 @@
 import { Plugin, PluginInfo } from "../types.ts";
-import { colors, ensureSymlinkSync, fromFileUrl, toFileUrl, dirname, ensureDirSync } from "../deps.ts";
+import {
+  colors,
+  dirname,
+  ensureDirSync,
+  ensureSymlinkSync,
+  fromFileUrl,
+  toFileUrl,
+} from "../deps.ts";
 import { resolve_path } from "../util/mod.ts";
 const { green, red } = colors;
 
@@ -10,19 +17,11 @@ export default class Symlink implements Plugin {
 
   info: PluginInfo = {
     name: "symlink",
-    subcmd: {
-      info: "make symlinks",
-    },
   };
 
-  constructor(options?: { dotfiles_dir?: string }) {
+  constructor(dotfiles_dir: string) {
     // set dotfiles basedir
-    if (options !== undefined && options.dotfiles_dir !== undefined) {
-      this.dotfiles_dir = resolve_path(options.dotfiles_dir);
-      resolve_path(options.dotfiles_dir);
-    } else {
-      this.dotfiles_dir = new URL(import.meta.url).pathname;
-    }
+    this.dotfiles_dir = resolve_path(dotfiles_dir);
   }
 
   stat() {
@@ -33,8 +32,8 @@ export default class Symlink implements Plugin {
 
   list() {
     this.links.forEach((link) => {
-      console.log(`・ ${link.from.pathname} → ${link.to.pathname}`)
-    })
+      console.log(`・ ${link.from.pathname} → ${link.to.pathname}`);
+    });
     return true;
   }
 

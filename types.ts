@@ -1,5 +1,3 @@
-import { parse } from "./deps.ts";
-
 export interface Plugin {
   info: PluginInfo;
   // souces must returns exit status
@@ -13,6 +11,7 @@ export interface Plugin {
 export interface PluginInfo {
   name: string;
   subcmd?: {
+    name: string;
     info: string;
   };
 }
@@ -23,11 +22,11 @@ export type Subcmd = {
   func: (options: SubcmdOptions) => boolean | Promise<boolean>;
 };
 
-export interface Options {
-  subcmd?: SubcmdOptions;
+export interface DfmOptions {
+  subcmdOptions?: SubcmdOptions;
 }
 
 export interface SubcmdOptions {
   name: string;
-  args: ReturnType<typeof parse>;
+  args: typeof Deno.args;
 }
