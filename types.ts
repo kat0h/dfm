@@ -1,15 +1,13 @@
 export interface Plugin {
-  info: PluginInfo;
+  name: string;
+
   // souces must returns exit status
   // if the process failed, the function returns false
   stat?: () => boolean | Promise<boolean>;
   list?: () => boolean | Promise<boolean>;
   sync?: () => boolean | Promise<boolean>;
-}
 
-export interface PluginInfo {
-  name: string;
-  subcmd?: Subcmd[];
+  subcmds?: Subcmd[];
 }
 
 export type Subcmd = {

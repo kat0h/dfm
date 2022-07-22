@@ -1,4 +1,4 @@
-import { Plugin, PluginInfo } from "../types.ts";
+import { Plugin } from "../types.ts";
 import { colors } from "../deps.ts";
 const { green, red } = colors;
 
@@ -6,9 +6,7 @@ const { green, red } = colors;
 export default class CmdCheck implements Plugin {
   private cmds: string[] = [];
 
-  info: PluginInfo = {
-    name: "cmdcheck",
-  };
+  name = "cmdcheck";
 
   async stat() {
     const p: { cmd: string; promise: Promise<Deno.ProcessStatus> }[] = [];

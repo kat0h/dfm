@@ -29,7 +29,7 @@ export default class Dfm {
           // プラグインの一覧を表示
           console.log(inverse(blue(bold("PLUGINS"))));
           this.plugins.forEach((plugin) => {
-            console.log(`・ ${plugin.info.name}`);
+            console.log(`・ ${plugin.name}`);
           });
           console.log();
           return this.cmd_base.bind(this)(options, "list");
@@ -57,8 +57,8 @@ export default class Dfm {
 
     plugins.forEach((plugin) => {
       this.plugins.push(plugin);
-      if (plugin.info.subcmd !== undefined) {
-        plugin.info.subcmd.forEach((subcmd) => {
+      if (plugin.subcmds !== undefined) {
+        plugin.subcmds.forEach((subcmd) => {
           this.subcmds.push({
             name: subcmd.name,
             info: subcmd.info,
@@ -107,10 +107,10 @@ export default class Dfm {
     for (const s of this.plugins) {
       const command = s[func];
       if (command != undefined) {
-        console.log(inverse(blue(bold(s.info.name.toUpperCase()))));
+        console.log(inverse(blue(bold(s.name.toUpperCase()))));
         const is_failed = !(await command.bind(s)());
         console.log();
-        exit_status.push({ name: s.info.name, is_failed: is_failed });
+        exit_status.push({ name: s.name, is_failed: is_failed });
       }
     }
 

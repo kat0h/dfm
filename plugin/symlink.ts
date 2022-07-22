@@ -1,4 +1,4 @@
-import { Plugin, PluginInfo } from "../types.ts";
+import { Plugin } from "../types.ts";
 import {
   colors,
   dirname,
@@ -11,13 +11,12 @@ import { resolve_path } from "../util/mod.ts";
 const { green, red } = colors;
 
 export default class Symlink implements Plugin {
+  name = "symlink";
+
   // links[n][0]: 実体 links[n][1]: シンボリックリンク
   private links: { from: URL; to: URL }[] = [];
   private dotfiles_dir: string;
 
-  info: PluginInfo = {
-    name: "symlink",
-  };
 
   constructor(dotfiles_dir: string) {
     // set dotfiles basedir
