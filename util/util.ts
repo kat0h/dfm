@@ -32,3 +32,7 @@ export function resolve_path(path: string, basedir?: string): string {
 export function isatty(): boolean {
   return Deno.isatty(Deno.stdout.rid);
 }
+
+export function os(): typeof Deno.build.os {
+  return Deno.build.os
+}
