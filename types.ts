@@ -21,6 +21,9 @@ export interface DfmOptions {
 }
 
 export interface SubcmdOptions {
-  name: string;
-  args: typeof Deno.args;
+  cmdName: string;
+  args: SubcmdArgs;
 }
+
+export type SubcmdArgs = string[]
+

@@ -79,10 +79,10 @@ export default class Dfm {
     // サブコマンドを実行
     if (this.options.subcmdOptions === undefined) {
       // 無引数で呼ばれた場合、ヘルプを表示する
-      this.cmd_help({ name: "help", args: [] });
+      this.cmd_help({ cmdName: "help", args: [] });
     } else {
       const subcmd = this.options.subcmdOptions;
-      const cmd = this.subcmds.find((sc: Subcmd) => sc.name === subcmd.name);
+      const cmd = this.subcmds.find((sc: Subcmd) => sc.name === subcmd.cmdName);
       if (cmd !== undefined) {
         const status = await cmd.func(subcmd);
         if (!status) {
@@ -151,7 +151,7 @@ function parse_argment(args: typeof Deno.args): DfmOptions {
   let subcmdOptions: SubcmdOptions | undefined = undefined;
   if (args.length !== 0) {
     subcmdOptions = {
-      name: Deno.args[0],
+      cmdName: Deno.args[0],
       args: Deno.args.slice(1),
     };
   }
