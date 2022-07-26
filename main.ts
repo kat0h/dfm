@@ -1,6 +1,6 @@
-import { colors } from "./deps.ts";
+import { colors, resolve } from "./deps.ts";
 import { DfmOptions, Plugin, Subcmd, SubcmdOptions } from "./types.ts";
-import { isatty } from "./util/util.ts";
+import { isatty, resolvePath } from "./util/util.ts";
 const { blue, bold, green, red, yellow, setColorEnabled, inverse } = colors;
 
 const version = "v0.3";
@@ -10,7 +10,16 @@ export default class Dfm {
   private plugins: Plugin[] = [];
   private subcmds: Subcmd[];
 
-  constructor() {
+  dfmFilePath: string;
+  dotfilesDir: string;
+
+  constructor(options: {
+    dotfilesDir: string,
+    dfmFilePath: string
+  }) {
+    this.dfmFilePath = resolvePath(options.dfmFilePath)
+    this.dotfilesDir = resolvePath(options.dotfilesDir)
+
     this.options = parse_argment(Deno.args);
     // サブコマンドの定義
     this.subcmds = [

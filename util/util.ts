@@ -2,7 +2,7 @@ import { join, resolve } from "../deps.ts";
 
 const homedir = Deno.env.get("HOME");
 
-export function expand_tilde(path: string) {
+export function expandTilde(path: string) {
   if (homedir === undefined) {
     return path;
   } else {
@@ -21,11 +21,11 @@ export function expand_tilde(path: string) {
 //   ./hoge/hugo   -> join($(pwd), "./hoge/hugo")
 //   /hoge/hugo    -> "/hoge/hugo"
 //   ~/hoge        -> "$HOME/hugo"
-export function resolve_path(path: string, basedir?: string): string {
+export function resolvePath(path: string, basedir?: string): string {
   if (basedir !== undefined) {
-    return resolve(basedir, expand_tilde(path));
+    return resolve(basedir, expandTilde(path));
   } else {
-    return resolve("", expand_tilde(path));
+    return resolve("", expandTilde(path));
   }
 }
 

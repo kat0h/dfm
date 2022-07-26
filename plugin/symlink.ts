@@ -1,3 +1,4 @@
+import Dfm from "../main.ts"
 import { Plugin } from "../types.ts";
 import {
   colors,
@@ -7,7 +8,7 @@ import {
   fromFileUrl,
   toFileUrl,
 } from "../deps.ts";
-import { resolve_path } from "../util/mod.ts";
+import { resolvePath } from "../util/mod.ts";
 const { green, red } = colors;
 
 export default class Symlink implements Plugin {
@@ -15,12 +16,12 @@ export default class Symlink implements Plugin {
 
   // links[n][0]: 実体 links[n][1]: シンボリックリンク
   private links: { from: URL; to: URL }[] = [];
-  private dotfiles_dir: string;
+  private dotfilesDir: string;
 
 
-  constructor(dotfiles_dir: string) {
+  constructor(dfm: Dfm) {
     // set dotfiles basedir
-    this.dotfiles_dir = resolve_path(dotfiles_dir);
+    this.dotfilesDir = resolvePath(dfm.dotfilesDir);
   }
 
   stat() {
@@ -47,9 +48,9 @@ export default class Symlink implements Plugin {
     // 作成するシンボリックリンクを登録
     links.forEach((link) => {
       const from_url = toFileUrl(
-        resolve_path(link[0], this.dotfiles_dir),
+        resolvePath(link[0], this.dotfilesDir),
       );
-      const to_url = toFileUrl(resolve_path(link[1]));
+      const to_url = toFileUrl(resolvePath(link[1]));
       this.links.push({
         from: from_url,
         to: to_url,

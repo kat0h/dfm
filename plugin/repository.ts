@@ -1,18 +1,21 @@
+import Dfm from "../main.ts"
 import { Plugin, SubcmdOptions } from "../types.ts";
-import { resolve_path } from "../util/mod.ts";
+import { resolvePath } from "../util/mod.ts";
 
 // dotfilesのディレクトリを表示します
 // cd $(dfm dir) などのように使ってください
 export default class Repository implements Plugin {
-  private dotfiles_dir: string;
+  private dotfilesDir: string;
+  private dfmFilePath: string
   name = "dir";
 
-  constructor(dotfiles_dir: string) {
-    this.dotfiles_dir = resolve_path(dotfiles_dir);
+  constructor(dfm: Dfm) {
+    this.dotfilesDir = resolvePath(dfm.dotfilesDir);
+    this.dfmFilePath = resolvePath(dfm.dfmFilePath)
   }
 
   list() {
-    console.log(this.dotfiles_dir);
+    console.log(this.dotfilesDir);
     return true;
   }
 
@@ -27,16 +30,38 @@ export default class Repository implements Plugin {
       info: "run git command in dotfiles directory",
       func: this.git,
     },
+    {
+      name: "edit",
+      info: "edit dotfiles with $EDITOR",
+      func: this.edit
+    }
   ];
 
   private dir() {
-    console.log(this.dotfiles_dir);
+    console.log(this.dotfilesDir);
     return true;
   }
-  private async git(_: SubcmdOptions, args: string[]) {
+  private async git(options: SubcmdOptions) {
     await Deno.run({
-      cmd: ["git", ...args],
-      cwd: this.dotfiles_dir,
+      cmd: ["git", ...options.args],
+      cwd: this.dotfilesDir,
+    }).status();
+    return true;
+  }
+  private async edit(options: SubcmdOptions) {
+    let editor = undefined
+    if (options.args.length === 0) {
+      editor = Deno.env.get("EDITOR")
+      if (editor === undefined) {
+        console.error("$EDITOR is undefined")
+        return false;
+      }
+    } else {
+      editor = options.args[0]
+    }
+    await Deno.run({
+      cmd: [editor, resolvePath(this.dfmFilePath)],
+      cwd: this.dotfilesDir,
     }).status();
     return true;
   }
