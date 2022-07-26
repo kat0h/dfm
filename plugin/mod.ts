@@ -1,6 +1,5 @@
 import Symlink from "./symlink.ts";
 import CmdCheck from "./cmdcheck.ts";
-import Dir from "./dir.ts";
-import Git from "./git.ts";
+import Repository from "./repository.ts";
 
-export { CmdCheck, Dir, Git, Symlink };
+export { CmdCheck, Repository, Symlink };
