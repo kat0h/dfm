@@ -1,4 +1,4 @@
-import Dfm from "../main.ts"
+import Dfm from "../main.ts";
 import { Plugin } from "../types.ts";
 import {
   colors,
@@ -17,7 +17,6 @@ export default class Symlink implements Plugin {
   // links[n][0]: 実体 links[n][1]: シンボリックリンク
   private links: { from: URL; to: URL }[] = [];
   private dotfilesDir: string;
-
 
   constructor(dfm: Dfm) {
     // set dotfiles basedir

@@ -14,11 +14,11 @@ export default class Dfm {
   dotfilesDir: string;
 
   constructor(options: {
-    dotfilesDir: string,
-    dfmFilePath: string
+    dotfilesDir: string;
+    dfmFilePath: string;
   }) {
-    this.dfmFilePath = resolvePath(options.dfmFilePath)
-    this.dotfilesDir = resolvePath(options.dotfilesDir)
+    this.dfmFilePath = resolvePath(options.dfmFilePath);
+    this.dotfilesDir = resolvePath(options.dotfilesDir);
 
     this.options = parse_argment(Deno.args);
     // サブコマンドの定義

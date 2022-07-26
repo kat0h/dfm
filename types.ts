@@ -25,5 +25,4 @@ export interface SubcmdOptions {
   args: SubcmdArgs;
 }
 
-export type SubcmdArgs = string[]
-
+export type SubcmdArgs = string[];

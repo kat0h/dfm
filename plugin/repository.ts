@@ -1,4 +1,4 @@
-import Dfm from "../main.ts"
+import Dfm from "../main.ts";
 import { Plugin, SubcmdOptions } from "../types.ts";
 import { resolvePath } from "../util/mod.ts";
 
@@ -6,12 +6,12 @@ import { resolvePath } from "../util/mod.ts";
 // cd $(dfm dir) などのように使ってください
 export default class Repository implements Plugin {
   private dotfilesDir: string;
-  private dfmFilePath: string
+  private dfmFilePath: string;
   name = "dir";
 
   constructor(dfm: Dfm) {
     this.dotfilesDir = resolvePath(dfm.dotfilesDir);
-    this.dfmFilePath = resolvePath(dfm.dfmFilePath)
+    this.dfmFilePath = resolvePath(dfm.dfmFilePath);
   }
 
   list() {
@@ -33,8 +33,8 @@ export default class Repository implements Plugin {
     {
       name: "edit",
       info: "edit dotfiles with $EDITOR",
-      func: this.edit
-    }
+      func: this.edit,
+    },
   ];
 
   private dir() {
@@ -49,15 +49,17 @@ export default class Repository implements Plugin {
     return true;
   }
   private async edit(options: SubcmdOptions) {
-    let editor = undefined
+    let editor = undefined;
     if (options.args.length === 0) {
-      editor = Deno.env.get("EDITOR")
+      editor = Deno.env.get("EDITOR");
       if (editor === undefined) {
-        console.error("$EDITOR is undefined, specify the command you want to use as an argument")
+        console.error(
+          "$EDITOR is undefined, specify the command you want to use as an argument",
+        );
         return false;
       }
     } else {
-      editor = options.args[0]
+      editor = options.args[0];
     }
     await Deno.run({
       cmd: [editor, resolvePath(this.dfmFilePath)],
