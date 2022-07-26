@@ -53,7 +53,7 @@ export default class Repository implements Plugin {
     if (options.args.length === 0) {
       editor = Deno.env.get("EDITOR")
       if (editor === undefined) {
-        console.error("$EDITOR is undefined")
+        console.error("$EDITOR is undefined, specify the command you want to use as an argument")
         return false;
       }
     } else {
