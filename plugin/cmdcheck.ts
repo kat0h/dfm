@@ -11,7 +11,6 @@ export default class CmdCheck implements Plugin {
   async stat() {
     const p: { cmd: string; promise: Promise<Deno.ProcessStatus> }[] = [];
     this.cmds.forEach((cmd) => {
-      console.log("UNKO")
       p.push({
         cmd: cmd,
         promise: Deno.run({
