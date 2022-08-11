@@ -1,5 +1,6 @@
 import { Plugin } from "../types.ts";
 import { colors } from "../deps.ts";
+import { resolvePath } from "../util/mod.ts"
 const { green, red, bold } = colors;
 
 // コマンドの存在を command -v を用いてチェックします
@@ -17,7 +18,7 @@ export default class Shell implements Plugin {
       this.cmds.push(cmd);
     });
     opts.path?.forEach((path) => {
-      this.path.push(path);
+      this.path.push(resolvePath(path));
     });
   }
 
