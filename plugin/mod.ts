@@ -1,5 +1,5 @@
 import Symlink from "./symlink.ts";
-import CmdCheck from "./cmdcheck.ts";
+import Shell from "./shell.ts";
 import Repository from "./repository.ts";
 
-export { CmdCheck, Repository, Symlink };
+export { Repository, Shell, Symlink };

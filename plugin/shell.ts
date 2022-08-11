@@ -1,12 +1,25 @@
 import { Plugin } from "../types.ts";
 import { colors } from "../deps.ts";
-const { green, red } = colors;
+const { green, red, bold } = colors;
 
 // コマンドの存在を command -v を用いてチェックします
-export default class CmdCheck implements Plugin {
+export default class Shell implements Plugin {
   private cmds: string[] = [];
+  private path: string[] = [];
 
-  name = "cmdcheck";
+  name = "shell";
+
+  constructor(opts: {
+    cmds?: string[];
+    path?: string[];
+  }) {
+    opts.cmds?.forEach((cmd) => {
+      this.cmds.push(cmd);
+    });
+    opts.path?.forEach((path) => {
+      this.path.push(path);
+    });
+  }
 
   async stat() {
     const p: { cmd: string; promise: Promise<Deno.ProcessStatus> }[] = [];
@@ -48,13 +61,14 @@ export default class CmdCheck implements Plugin {
   }
 
   list() {
-    console.log(`${this.cmds}`);
-    return true;
-  }
+    console.log(bold("COMMANDS"));
+    console.log(`・ ${this.cmds}`);
+    console.log();
 
-  cmd(cmds: string[]) {
-    cmds.forEach((cmd) => {
-      this.cmds.push(cmd);
+    console.log(bold("PATH"));
+    this.path.forEach((path) => {
+      console.log(`・ ${path}`);
     });
+    return true;
   }
 }

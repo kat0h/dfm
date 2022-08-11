@@ -1,4 +1,4 @@
-import { colors, resolve } from "./deps.ts";
+import { colors } from "./deps.ts";
 import { DfmOptions, Plugin, Subcmd, SubcmdOptions } from "./types.ts";
 import { isatty, resolvePath } from "./util/util.ts";
 const { blue, bold, green, red, yellow, setColorEnabled, inverse } = colors;

@@ -15,7 +15,7 @@ export default class Repository implements Plugin {
   }
 
   list() {
-    console.log(this.dotfilesDir);
+    console.log(`・ ${this.dotfilesDir}`);
     return true;
   }
 
@@ -38,9 +38,10 @@ export default class Repository implements Plugin {
   ];
 
   private dir() {
-    console.log(this.dotfilesDir);
+    console.log(`${this.dotfilesDir}`);
     return true;
   }
+
   private async git(options: SubcmdOptions) {
     await Deno.run({
       cmd: ["git", ...options.args],
@@ -48,6 +49,7 @@ export default class Repository implements Plugin {
     }).status();
     return true;
   }
+
   private async edit(options: SubcmdOptions) {
     let editor = undefined;
     if (options.args.length === 0) {

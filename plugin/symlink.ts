@@ -18,9 +18,20 @@ export default class Symlink implements Plugin {
   private links: { from: URL; to: URL }[] = [];
   private dotfilesDir: string;
 
-  constructor(dfm: Dfm) {
+  constructor(dfm: Dfm, links: [string, string][]) {
     // set dotfiles basedir
     this.dotfilesDir = resolvePath(dfm.dotfilesDir);
+    // 作成するシンボリックリンクを登録
+    links.forEach((link) => {
+      const from_url = toFileUrl(
+        resolvePath(link[0], this.dotfilesDir),
+      );
+      const to_url = toFileUrl(resolvePath(link[1]));
+      this.links.push({
+        from: from_url,
+        to: to_url,
+      });
+    });
   }
 
   stat() {
@@ -41,20 +52,6 @@ export default class Symlink implements Plugin {
     ensure_make_symlinks(this.links);
     console.log("OK");
     return true;
-  }
-
-  link(links: [string, string][]) {
-    // 作成するシンボリックリンクを登録
-    links.forEach((link) => {
-      const from_url = toFileUrl(
-        resolvePath(link[0], this.dotfilesDir),
-      );
-      const to_url = toFileUrl(resolvePath(link[1]));
-      this.links.push({
-        from: from_url,
-        to: to_url,
-      });
-    });
   }
 }
 
