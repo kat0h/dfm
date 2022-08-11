@@ -1,50 +1,63 @@
 # dfm
 
-![](https://user-images.githubusercontent.com/45391880/181011253-1f5bc9b7-47aa-42d1-97cd-ab39ff8c4931.png)
+<img src="https://user-images.githubusercontent.com/45391880/184128345-ab2ed635-c9e8-466e-b9a1-d8b0d05e68a7.png" width="50%">
 
 Example:
 
 ```typescript
 #!/usr/bin/env -S deno run -A
 import Dfm from "https://deno.land/x/dfm/mod.ts";
-import {
-  CmdCheck,
-  Repository,
-  Symlink,
-} from "https://deno.land/x/dfm/plugin/mod.ts";
-import { fromFileUrl } from "https://deno.land/std/path/mod.ts";
+import { Shell, Repository, Symlink } from "https://deno.land/x/dfm/plugin/mod.ts";
+import { fromFileUrl } from "https://deno.land/std@0.149.0/path/mod.ts";
 import { os } from "https://deno.land/x/dfm/util/mod.ts";
 
 const dfm = new Dfm({
   dotfilesDir: "~/dotfiles",
   dfmFilePath: fromFileUrl(import.meta.url),
 });
-const s = new Symlink(dfm);
-const c = new CmdCheck();
-const r = new Repository(dfm);
 
-s.link([
+const links: [string, string][] = [
   ["zshrc", "~/.zshrc"],
   ["tmux.conf", "~/.tmux.conf"],
   ["vimrc", "~/.vimrc"],
   ["vim", "~/.vim"],
   ["config/alacritty", "~/.config/alacritty"],
-]);
+];
 
-c.cmd([
+const cmds: string[] = [
   "vim",
   "nvim",
   "clang",
   "curl",
   "wget",
-]);
+];
 
-if (os() === "darwin") {
-  c.cmd(["cot"]);
+let path: string[] = [
+  "~/.deno/bin",
+]
+
+if (os() == "darwin") {
+  path = path.concat([
+    "~/mybin",
+    "/usr/local/opt/ruby/bin"
+  ])
+
+} else if (os() == "linux") {
+  path = path.concat([])
 }
 
-dfm.use(s, c, r);
+
+dfm.use(
+  new Symlink(dfm, links),
+  new Shell({
+    env_path: "~/.cache/env",
+    cmds: cmds,
+    path: path
+  }),
+  new Repository(dfm),
+);
 dfm.end();
+// vim:filetype=typescript
 ```
 
 **WARNING** DFM is a experimental implementation based on my idea
