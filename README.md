@@ -5,7 +5,7 @@
 Example:
 
 ```typescript
-#!/usr/bin/env deno run -A
+#!/usr/bin/env -S deno run -A
 import Dfm from "https://deno.land/x/dfm/mod.ts";
 import {
   CmdCheck,
