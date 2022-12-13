@@ -90,7 +90,7 @@ export default class Shell implements Plugin {
       // add path
       // TODO: sanitize PATH
       buffer.push(
-        `export PATH=$PATH:'${path.replace(/\\/, "\\\\").replace(/'/, `\\\'`)}'`
+        `export PATH='${path.replace(/\\/, "\\\\").replace(/'/, `\\\'`)}':$PATH`
       )
     })
 
