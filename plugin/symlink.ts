@@ -111,7 +111,7 @@ function ensure_make_symlinks(links: { from: URL; to: URL }[]): boolean {
       } catch (err) {
 	if (err.message.indexOf("Ensure path exists, expected") === 0) {
           console.log(
-            `・ ${red("✘  ")} ${from} → ${to}: ${red("File or Directory already exsts.")}`,
+            `・ ${red("✘  ")} ${from} → ${to}: ${red("File or Directory already exists.")}`,
           );
 	  // エラー
 	  return false
