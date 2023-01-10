@@ -9,7 +9,7 @@ import {
   toFileUrl,
 } from "../deps.ts";
 import { resolvePath } from "../util/mod.ts";
-const { green, red } = colors;
+const { green, red, gray } = colors;
 
 export default class Symlink implements Plugin {
   name = "symlink";
@@ -49,9 +49,13 @@ export default class Symlink implements Plugin {
 
   sync() {
     // リンクが存在していなければ貼る
-    ensure_make_symlinks(this.links);
-    console.log("OK");
-    return true;
+    let status = ensure_make_symlinks(this.links);
+    if (status) {
+      console.log("OK");
+      return true;
+    } else {
+      return false;
+    }
   }
 }
 
@@ -95,14 +99,37 @@ function check_symlink(link: { from: URL; to: URL }): boolean {
 }
 
 // if symlink does not exist, make symlink
-function ensure_make_symlinks(links: { from: URL; to: URL }[]): void {
-  links.forEach((link) => {
+// syncコマンドから直接呼ばれる
+function ensure_make_symlinks(links: { from: URL; to: URL }[]): boolean {
+  let err = links.map((link) => {
     const from = link.from.pathname;
     const to = link.to.pathname;
     ensureDirSync(dirname(to));
     if (!check_symlink(link)) {
+      try {
+        ensureSymlinkSync(from, to);
+      } catch (err) {
+	if (err.message.indexOf("Ensure path exists, expected") === 0) {
+          console.log(
+            `・ ${red("✘  ")} ${from} → ${to}: ${red("File or Directory already exsts.")}`,
+          );
+	  // エラー
+	  return false
+	} else {
+	   throw err
+	}
+      }
+      // 成功のメッセージはシンボリックリンクの作成に成功してから表示する
       console.log(`・ ${green("✔  ")} ${from} → ${to}`);
-      ensureSymlinkSync(from, to);
+    } else {
+      console.log(`・ ${green("✔  ")} ${gray(to)}`);
     }
+    return true
   });
+
+  // すべての処理が正常に終了しているかチェック
+  if (err.find(s => !s) !== undefined) {
+    return false
+  }
+  return true
 }
