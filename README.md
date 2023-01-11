@@ -1,4 +1,4 @@
-# dfm
+# dfm (Dotfiles Manager written in TypeScript)
 
 <img src="https://user-images.githubusercontent.com/45391880/184128345-ab2ed635-c9e8-466e-b9a1-d8b0d05e68a7.png" width="50%">
 
