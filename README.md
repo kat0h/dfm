@@ -2,10 +2,10 @@
 
 <img src="https://user-images.githubusercontent.com/45391880/184128345-ab2ed635-c9e8-466e-b9a1-d8b0d05e68a7.png" width="50%">
 
-Example: [My settings is here](https://github.com/kat0h/dotfiles/blob/master/bin/dot.ts)
+Example: [My settings is here](https://github.com/kat0h/dotfiles/blob/master/bin/dot)
 
 ```typescript
-#!/usr/bin/env -S deno run -A
+#!/usr/bin/env -S deno run -A --ext ts
 import Dfm from "https://deno.land/x/dfm/mod.ts";
 import { Shell, Repository, Symlink } from "https://deno.land/x/dfm/plugin/mod.ts";
 import { fromFileUrl } from "https://deno.land/std@0.149.0/path/mod.ts";
